@@ -18,9 +18,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   REDIS_PORT: Env.schema.number(),
   REDIS_PASSWORD: Env.schema.string.optional(),
 
-  DISCORD_CLIENT_ID: Env.schema.string(),
-  DISCORD_CLIENT_SECRET: Env.schema.string(),
-  DISCORD_REDIRECT_URI: Env.schema.string({ format: 'url', tld: false }),
+  DISCORD_CLIENT_ID: Env.schema.string.optional(),
+  DISCORD_CLIENT_SECRET: Env.schema.string.optional(),
+  DISCORD_REDIRECT_URI: Env.schema.string.optional(),
 
   CORS_ORIGIN: Env.schema.string(),
 
