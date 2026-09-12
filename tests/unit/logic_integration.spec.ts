@@ -6,7 +6,7 @@ import {
   calculate_bayesian_shrinkage,
   analyze_raid_risk,
   evaluate_rank_separation,
-} from '@vote-internals/logic'
+} from '@platform/internal-logic'
 
 test.group('Logic Integration', () => {
   test('validates valid 3-2-1 ballot', async ({ assert }) => {

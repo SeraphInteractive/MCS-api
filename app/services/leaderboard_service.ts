@@ -1,7 +1,7 @@
 import redis from '@adonisjs/redis/services/main'
 import BallotModel from '#models/ballot'
 import Entry from '#models/entry'
-import { aggregate_scores, calculate_bayesian_shrinkage, type Ballot as LogicBallot } from '@vote-internals/logic'
+import { aggregate_scores, calculate_bayesian_shrinkage, type Ballot as LogicBallot } from '@platform/internal-logic'
 
 export class LeaderboardService {
   async computeLeaderboard(roundId: string): Promise<{ leaderboard: any[]; totalBallots: number; isConserved: boolean }> {

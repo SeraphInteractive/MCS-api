@@ -1,6 +1,6 @@
 # MCS-api
 
-Backend API for ranked 3-2-1 voting rounds, vote validation, and live raid telemetry. Built with AdonisJS 6, PostgreSQL, and Redis, integrating `@vote-internals/logic`.
+Backend API for ranked 3-2-1 voting rounds, vote validation, and live raid telemetry. Built with AdonisJS 6, PostgreSQL, and Redis, integrating `@platform/internal-logic`.
 
 ## What it does
 

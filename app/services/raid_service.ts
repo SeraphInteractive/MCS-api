@@ -3,7 +3,7 @@ import Entry from '#models/entry'
 import RaidTelemetryModel from '#models/raid_telemetry'
 import db from '@adonisjs/lucid/services/db'
 import { eventBus } from './event_bus.js'
-import { analyze_raid_risk, type EntryScoreBreakdown } from '@vote-internals/logic'
+import { analyze_raid_risk, type EntryScoreBreakdown } from '@platform/internal-logic'
 
 export class RaidService {
   async analyzeEntry(entryId: string, roundId: string): Promise<RaidTelemetryModel> {

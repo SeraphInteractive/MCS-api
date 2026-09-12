@@ -10,7 +10,7 @@ import {
   evaluate_rank_separation,
   type Ballot as LogicBallot,
   type EntryScoreBreakdown,
-} from '@vote-internals/logic'
+} from '@platform/internal-logic'
 
 export class FinalizationService {
   async finalizeRound(roundId: string, userId: string): Promise<RoundResult> {

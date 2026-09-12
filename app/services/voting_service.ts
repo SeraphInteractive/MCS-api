@@ -1,4 +1,4 @@
-import { validate_ballot, type Ballot as LogicBallot } from '@vote-internals/logic'
+import { validate_ballot, type Ballot as LogicBallot } from '@platform/internal-logic'
 import VotingRound from '#models/voting_round'
 import Entry from '#models/entry'
 import BallotModel from '#models/ballot'

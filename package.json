@@ -1,6 +1,6 @@
 {
-  "name": "vote-api",
-  "version": "0.0.0",
+  "name": "@platform/api",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -64,7 +64,7 @@
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
-    "@vote-internals/logic": "file:../vote-internals",
+    "@platform/internal-logic": "github:SeraphInteractive/Platform-Internal-Logic#main",
     "luxon": "^3.7.2",
     "pg": "^8.23.0",
     "reflect-metadata": "^0.2.2"
