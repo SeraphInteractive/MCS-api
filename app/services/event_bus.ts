@@ -4,6 +4,12 @@ export interface EventMap {
   'raid:alert': { entryId: string; roundId: string; severity: string; compositeScore: number }
   'ballot:submitted': { roundId: string; voterId: string; entryIds: string[] }
   'round:finalized': { roundId: string; resultId: string }
+  'shot:claimed': { shotId: string; shotCode: string; userId: string }
+  'shot:released': { shotId: string; shotCode: string; reason?: string }
+  'shot:expired': { shotId: string; shotCode: string }
+  'submission:created': { submissionId: string; shotId: string; shotCode: string; contributorId: string }
+  'submission:reviewed': { submissionId: string; shotId: string; shotCode: string; status: string }
+  'contributor:promoted': { userId: string; promotedBy: string }
 }
 
 export class EventBus {

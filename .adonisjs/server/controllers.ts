@@ -8,6 +8,8 @@ export const controllers = {
   Ballots: () => import('#controllers/ballots_controller'),
   Entries: () => import('#controllers/entries_controller'),
   Leaderboard: () => import('#controllers/leaderboard_controller'),
+  Reviews: () => import('#controllers/reviews_controller'),
   Rounds: () => import('#controllers/rounds_controller'),
+  Shots: () => import('#controllers/shots_controller'),
   Telemetry: () => import('#controllers/telemetry_controller'),
 }

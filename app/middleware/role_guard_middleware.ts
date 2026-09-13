@@ -6,11 +6,14 @@ export default class RoleGuardMiddleware {
   async handle(ctx: HttpContext, next: NextFn, options: { roles: string[] }) {
     const userRole = ctx.auth.user?.role || 'voter'
     
-    // role hierarchy mapping
+    // role hierarchy mapping where higher level includes lower level capabilities
     const hierarchy: Record<string, number> = {
       voter: 1,
-      moderator: 2,
-      admin: 3
+      contributor: 2,
+      senior_contributor: 3,
+      supervisor: 4,
+      moderator: 4,
+      admin: 5
     }
     
     const userLevel = hierarchy[userRole] || 1

@@ -25,5 +25,18 @@ export default await Env.create(new URL('../', import.meta.url), {
   CORS_ORIGIN: Env.schema.string(),
 
   ADMIN_DISCORD_IDS: Env.schema.string.optional(),
+  SUPERVISOR_DISCORD_IDS: Env.schema.string.optional(),
   MODERATOR_DISCORD_IDS: Env.schema.string.optional(),
+  SENIOR_DISCORD_IDS: Env.schema.string.optional(),
+
+  // storage configuration for R2/S3
+  S3_ENDPOINT: Env.schema.string.optional(),
+  S3_REGION: Env.schema.string.optional(),
+  S3_BUCKET: Env.schema.string.optional(),
+  S3_ACCESS_KEY_ID: Env.schema.string.optional(),
+  S3_SECRET_ACCESS_KEY: Env.schema.string.optional(),
+
+  // discord webhook urls
+  DISCORD_WEBHOOK_URL: Env.schema.string.optional(),
+  DISCORD_SUPERVISOR_WEBHOOK_URL: Env.schema.string.optional(),
 })

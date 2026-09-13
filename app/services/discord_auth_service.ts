@@ -52,15 +52,25 @@ export class DiscordAuthService {
   }
 
   async findOrCreateUser(profile: DiscordUserProfile): Promise<User> {
-    // check env arrays to see if they get special roles
-    const adminIds = ((env.get('ADMIN_DISCORD_IDS') as string) || '').split(',')
-    const modIds = ((env.get('MODERATOR_DISCORD_IDS') as string) || '').split(',')
+    // check env lists to see if they get special roles
+    const adminIds = ((env.get('ADMIN_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
+    const supervisorIds = ((env.get('SUPERVISOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
+    const modIds = ((env.get('MODERATOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
+    const seniorIds = ((env.get('SENIOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
 
     let role = 'voter'
     if (adminIds.includes(profile.id)) {
       role = 'admin'
-    } else if (modIds.includes(profile.id)) {
-      role = 'moderator'
+    } else if (supervisorIds.includes(profile.id) || modIds.includes(profile.id)) {
+      role = 'supervisor'
+    } else if (seniorIds.includes(profile.id)) {
+      role = 'senior_contributor'
+    }
+
+    // if user already exists, preserve their role unless env assigns higher role
+    const existing = await User.findBy('discordId', profile.id)
+    if (existing && role === 'voter') {
+      role = existing.role
     }
 
     // update if they exist or create a new row

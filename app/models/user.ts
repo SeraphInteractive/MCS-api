@@ -5,6 +5,8 @@ import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import { randomUUID } from 'node:crypto'
 import VotingRound from '#models/voting_round'
 import Ballot from '#models/ballot'
+import Shot from '#models/shot'
+import Submission from '#models/submission'
 import type { AccessToken } from '@adonisjs/auth/access_tokens'
 
 export default class User extends BaseModel {
@@ -41,6 +43,12 @@ export default class User extends BaseModel {
 
   @hasMany(() => Ballot, { foreignKey: 'voterId' })
   declare ballots: HasMany<typeof Ballot>
+
+  @hasMany(() => Shot, { foreignKey: 'claimedBy' })
+  declare shotsClaimed: HasMany<typeof Shot>
+
+  @hasMany(() => Submission, { foreignKey: 'contributorId' })
+  declare submissions: HasMany<typeof Submission>
 
   // generate uuid before creating
   @beforeCreate()
