@@ -18,11 +18,12 @@ router.get('/', () => {
 // container health check: 200 when postgres and redis are reachable, 503 otherwise
 router.get('/health', [HealthChecksController])
 
+// unversioned alias of the oauth routes. named separately: routes are auto-named after their
+// controller method, and the same names are taken by the /api/v1 group below
 router.group(() => {
-  // auth routes (no auth required for initiation or callback)
   router.get('auth/discord', [AuthController, 'redirect'])
   router.get('auth/discord/callback', [AuthController, 'callback'])
-}).prefix('/api')
+}).prefix('/api').as('unversioned')
 
 router.group(() => {
   // auth routes (no auth required for initiation or callback)
