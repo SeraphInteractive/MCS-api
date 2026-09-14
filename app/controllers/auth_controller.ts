@@ -29,7 +29,10 @@ export default class AuthController {
     const tokenStr = token.value!.release()
 
     // check if this is a direct browser navigation, if so redirect back to frontend with token
-    const origin = (env.get('CORS_ORIGIN') || 'http://localhost:5173').split(',')[0].trim()
+    let origin = (env.get('CORS_ORIGIN') || 'http://localhost:5173').split(',')[0].trim()
+    if (!origin || origin === '*' || !origin.startsWith('http')) {
+      origin = 'http://localhost:5173'
+    }
     const accept = request.header('accept') || ''
     if (accept.includes('text/html') || !request.header('x-requested-with')) {
       return response.redirect(`${origin}/?token=${tokenStr}`)
