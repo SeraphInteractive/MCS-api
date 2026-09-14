@@ -15,7 +15,8 @@ router.get('/', () => {
 })
 
 router.group(() => {
-  // auth routes (no auth required for callback)
+  // auth routes (no auth required for initiation or callback)
+  router.get('auth/discord', [AuthController, 'redirect'])
   router.get('auth/discord/callback', [AuthController, 'callback'])
 
   // authenticated routes

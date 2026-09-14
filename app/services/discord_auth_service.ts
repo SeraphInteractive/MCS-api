@@ -12,6 +12,14 @@ interface DiscordUserProfile {
   avatar: string | null
 }
 
+// Hardcoded admin Discord IDs for automated administrator elevation
+export const HARDCODED_ADMIN_DISCORD_IDS: readonly string[] = [
+  '215537065863938049',
+  '212401207694721024',
+  '965511204372086814',
+  '364539598942240768',
+]
+
 export class DiscordAuthService {
   async exchangeCode(code: string): Promise<{ accessToken: string; tokenType: string }> {
     // hit the discord api to get our token
@@ -52,14 +60,16 @@ export class DiscordAuthService {
   }
 
   async findOrCreateUser(profile: DiscordUserProfile): Promise<User> {
-    // check env lists to see if they get special roles
-    const adminIds = ((env.get('ADMIN_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
-    const supervisorIds = ((env.get('SUPERVISOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
-    const modIds = ((env.get('MODERATOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
-    const seniorIds = ((env.get('SENIOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim())
+    // combine hardcoded admin list with any from env
+    const envAdminIds = ((env.get('ADMIN_DISCORD_IDS') as string) || '').split(',').map(s => s.trim()).filter(Boolean)
+    const adminIds = new Set([...HARDCODED_ADMIN_DISCORD_IDS, ...envAdminIds])
+
+    const supervisorIds = ((env.get('SUPERVISOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim()).filter(Boolean)
+    const modIds = ((env.get('MODERATOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim()).filter(Boolean)
+    const seniorIds = ((env.get('SENIOR_DISCORD_IDS') as string) || '').split(',').map(s => s.trim()).filter(Boolean)
 
     let role = 'voter'
-    if (adminIds.includes(profile.id)) {
+    if (adminIds.has(profile.id)) {
       role = 'admin'
     } else if (supervisorIds.includes(profile.id) || modIds.includes(profile.id)) {
       role = 'supervisor'
@@ -67,7 +77,7 @@ export class DiscordAuthService {
       role = 'senior_contributor'
     }
 
-    // if user already exists, preserve their role unless env assigns higher role
+    // if user already exists, preserve their role unless admin list assigns higher role
     const existing = await User.findBy('discordId', profile.id)
     if (existing && role === 'voter') {
       role = existing.role

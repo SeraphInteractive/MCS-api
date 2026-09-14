@@ -2,7 +2,17 @@ import { HttpContext } from '@adonisjs/core/http'
 import DiscordAuthService from '#services/discord_auth_service'
 import User from '#models/user'
 
+import env from '#start/env'
+
 export default class AuthController {
+  async redirect({ response }: HttpContext) {
+    const clientId = env.get('DISCORD_CLIENT_ID') as string
+    const redirectUri = encodeURIComponent((env.get('DISCORD_REDIRECT_URI') as string) || '')
+    const scope = encodeURIComponent('identify')
+    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`
+    return response.redirect(discordAuthUrl)
+  }
+
   async callback({ request, response }: HttpContext) {
     const code = request.input('code')
     if (!code) {
@@ -16,16 +26,24 @@ export default class AuthController {
 
     // using accessTokens provider
     const token = await User.accessTokens.create(user)
+    const tokenStr = token.value!.release()
+
+    // check if this is a direct browser navigation, if so redirect back to frontend with token
+    const origin = (env.get('CORS_ORIGIN') || 'http://localhost:5173').split(',')[0].trim()
+    const accept = request.header('accept') || ''
+    if (accept.includes('text/html') || !request.header('x-requested-with')) {
+      return response.redirect(`${origin}/?token=${tokenStr}`)
+    }
 
     return {
       data: {
-        token: token.value!.release(),
+        token: tokenStr,
         user: {
           id: user.id,
           discordUsername: user.discordUsername,
-          role: user.role
-        }
-      }
+          role: user.role,
+        },
+      },
     }
   }
 
