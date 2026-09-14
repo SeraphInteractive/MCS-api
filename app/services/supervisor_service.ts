@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { Exception } from '@adonisjs/core/exceptions'
 import Submission from '#models/submission'
 import Shot from '#models/shot'
 import User from '#models/user'
@@ -22,7 +23,10 @@ export class SupervisorService {
 
     // verify the submitter owns the active claim
     if (shot.claimedBy !== user.id) {
-      throw new Error('You do not own the active claim for this shot.')
+      throw new Exception('You do not own the active claim for this shot.', {
+        status: 403,
+        code: 'FORBIDDEN',
+      })
     }
 
     // compute the next version number
@@ -116,6 +120,11 @@ export class SupervisorService {
 
   async promoteToSenior(targetUserId: string, supervisor: User): Promise<User> {
     const targetUser = await User.findOrFail(targetUserId)
+
+    // do not demote existing senior contributors, supervisors, or admins
+    if (['senior_contributor', 'supervisor', 'admin'].includes(targetUser.role)) {
+      return targetUser
+    }
 
     targetUser.role = 'senior_contributor'
     await targetUser.save()

@@ -36,10 +36,10 @@ export default class VotingRound extends BaseModel {
   @belongsTo(() => User, { foreignKey: 'createdBy' })
   declare creator: BelongsTo<typeof User>
 
-  @hasMany(() => Entry)
+  @hasMany(() => Entry, { foreignKey: 'roundId' })
   declare entries: HasMany<typeof Entry>
 
-  @hasMany(() => Ballot)
+  @hasMany(() => Ballot, { foreignKey: 'roundId' })
   declare ballots: HasMany<typeof Ballot>
 
   // generate uuid

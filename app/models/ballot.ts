@@ -33,7 +33,7 @@ export default class Ballot extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
-  @belongsTo(() => VotingRound)
+  @belongsTo(() => VotingRound, { foreignKey: 'roundId' })
   declare votingRound: BelongsTo<typeof VotingRound>
 
   @belongsTo(() => User, { foreignKey: 'voterId' })

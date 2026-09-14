@@ -1,3 +1,5 @@
+import db from '@adonisjs/lucid/services/db'
+import { Exception } from '@adonisjs/core/exceptions'
 import VotingRound from '#models/voting_round'
 import BallotModel from '#models/ballot'
 import Entry from '#models/entry'
@@ -14,11 +16,15 @@ import {
 
 export class FinalizationService {
   async finalizeRound(roundId: string, userId: string): Promise<RoundResult> {
-    // ensure round is ready to be locked in
-    const round = await VotingRound.findOrFail(roundId)
-    if (round.status !== 'closed') {
-      throw new Error('round is not closed')
-    }
+    return await db.transaction(async (trx) => {
+      // ensure round is ready to be locked in
+      const round = await VotingRound.query({ client: trx }).where('id', roundId).forUpdate().firstOrFail()
+      if (round.status !== 'closed') {
+        throw new Exception(`Round ${roundId} cannot be finalized because its status is ${round.status}. It must be closed first.`, {
+          status: 409,
+          code: 'ROUND_NOT_CLOSED',
+        })
+      }
 
     const entries = await Entry.query().where('roundId', roundId)
     const ballots = await BallotModel.query().where('roundId', roundId)
@@ -56,29 +62,34 @@ export class FinalizationService {
       separationResults.push(separation)
     }
 
-    // save the final results record
-    const result = await RoundResult.create({
-      roundId,
-      totalBallots: aggregation.totalBallots,
-      totalPoints: aggregation.totalPointsAwarded,
-      isConserved: aggregation.isConserved,
-      leaderboard: leaderboardData,
-      separationResults: separationResults,
-      finalizedAt: DateTime.now(),
-      finalizedBy: userId,
+      // save the final results record
+      const result = await RoundResult.create(
+        {
+          roundId,
+          totalBallots: aggregation.totalBallots,
+          totalPoints: aggregation.totalPointsAwarded,
+          isConserved: aggregation.isConserved,
+          leaderboard: leaderboardData,
+          separationResults: separationResults,
+          finalizedAt: DateTime.now(),
+          finalizedBy: userId,
+        },
+        { client: trx }
+      )
+
+      // mark round as fully finalized
+      round.useTransaction(trx)
+      round.status = 'finalized'
+      await round.save()
+
+      // notify anything listening
+      eventBus.emit('round:finalized', {
+        roundId,
+        resultId: result.id,
+      })
+
+      return result
     })
-
-    // mark round as fully finalized
-    round.status = 'finalized'
-    await round.save()
-
-    // notify anything listening
-    eventBus.emit('round:finalized', {
-      roundId,
-      resultId: result.id,
-    })
-
-    return result
   }
 
   async finalize(roundId: string, userId: string): Promise<RoundResult> {

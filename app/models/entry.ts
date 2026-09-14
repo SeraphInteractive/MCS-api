@@ -31,7 +31,7 @@ export default class Entry extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
-  @belongsTo(() => VotingRound)
+  @belongsTo(() => VotingRound, { foreignKey: 'roundId' })
   declare votingRound: BelongsTo<typeof VotingRound>
 
   // assign id

@@ -34,15 +34,15 @@ export default class RaidTelemetry extends BaseModel {
 
   // parse json flags
   @column({
-    prepare: (value: any) => JSON.stringify(value),
-    consume: (value: string) => JSON.parse(value)
+    prepare: (value: any) => (value && typeof value === 'object' ? JSON.stringify(value) : value),
+    consume: (value: any) => (typeof value === 'string' ? JSON.parse(value) : value)
   })
   declare flags: any
 
   // parse json breakdown
   @column({
-    prepare: (value: any) => JSON.stringify(value),
-    consume: (value: string) => JSON.parse(value)
+    prepare: (value: any) => (value && typeof value === 'object' ? JSON.stringify(value) : value),
+    consume: (value: any) => (typeof value === 'string' ? JSON.parse(value) : value)
   })
   declare breakdown: any
 
@@ -52,7 +52,7 @@ export default class RaidTelemetry extends BaseModel {
   @belongsTo(() => Entry)
   declare entry: BelongsTo<typeof Entry>
 
-  @belongsTo(() => VotingRound)
+  @belongsTo(() => VotingRound, { foreignKey: 'roundId' })
   declare votingRound: BelongsTo<typeof VotingRound>
 
   // get uuid on create

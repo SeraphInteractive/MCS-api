@@ -1,5 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import Entry from '#models/entry'
+import VotingRound from '#models/voting_round'
 import { createEntryValidator, updateEntryValidator } from '#validators/entry_validator'
 
 export default class EntriesController {
@@ -9,6 +10,7 @@ export default class EntriesController {
   }
 
   async store({ params, request }: HttpContext) {
+    await VotingRound.findOrFail(params.roundId)
     const payload = await request.validateUsing(createEntryValidator)
     const entry = new Entry()
     

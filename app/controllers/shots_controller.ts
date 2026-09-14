@@ -79,13 +79,13 @@ export default class ShotsController {
     return { data: shot }
   }
 
-  async uploadUrl({ params, auth, request }: HttpContext) {
+  async uploadUrl({ params, auth, request, response }: HttpContext) {
     const payload = await request.validateUsing(getUploadUrlValidator)
     const shot = await Shot.findOrFail(params.id)
 
     // verify ownership
     if (shot.claimedBy !== auth.user!.id) {
-      return { error: { code: 'FORBIDDEN', message: 'You do not own the active claim for this shot.' } }
+      return response.forbidden({ error: { code: 'FORBIDDEN', message: 'You do not own the active claim for this shot.' } })
     }
 
     // get latest version to determine next version folder

@@ -48,4 +48,12 @@ test.group('GrabBox & Pipeline Engine', () => {
     assert.equal(events[1].data.submissionId, 'sub-1')
     assert.equal(events[2].data.userId, 'user-1')
   })
+
+  test('validates tier duration boundaries', async ({ assert }) => {
+    const service = new GrabBoxService()
+    assert.equal(service.getTierDurationDays('easy'), 5)
+    assert.equal(service.getTierDurationDays('medium'), 7)
+    assert.equal(service.getTierDurationDays('hard'), 10)
+    assert.equal(service.getTierDurationDays('complex'), 14)
+  })
 })

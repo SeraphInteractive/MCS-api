@@ -25,14 +25,14 @@ export default class RoundResult extends BaseModel {
 
   // handle json data
   @column({
-    prepare: (value: any) => JSON.stringify(value),
-    consume: (value: string) => JSON.parse(value)
+    prepare: (value: any) => (value && typeof value === 'object' ? JSON.stringify(value) : value),
+    consume: (value: any) => (typeof value === 'string' ? JSON.parse(value) : value)
   })
   declare leaderboard: any
 
   @column({
-    prepare: (value: any) => JSON.stringify(value),
-    consume: (value: string) => JSON.parse(value)
+    prepare: (value: any) => (value && typeof value === 'object' ? JSON.stringify(value) : value),
+    consume: (value: any) => (typeof value === 'string' ? JSON.parse(value) : value)
   })
   declare separationResults: any
 
@@ -42,7 +42,7 @@ export default class RoundResult extends BaseModel {
   @column()
   declare finalizedBy: string
 
-  @belongsTo(() => VotingRound)
+  @belongsTo(() => VotingRound, { foreignKey: 'roundId' })
   declare votingRound: BelongsTo<typeof VotingRound>
 
   @belongsTo(() => User, { foreignKey: 'finalizedBy' })

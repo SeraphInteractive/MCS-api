@@ -1,4 +1,5 @@
 import { validate_ballot, type Ballot as LogicBallot } from '@platform/internal-logic'
+import db from '@adonisjs/lucid/services/db'
 import VotingRound from '#models/voting_round'
 import Entry from '#models/entry'
 import BallotModel from '#models/ballot'
@@ -44,15 +45,18 @@ export class VotingService {
       throw new BallotValidationException([...validation.errors])
     }
 
-    // save the ballot to db and overwrite if they already voted
-    const ballot = await BallotModel.updateOrCreate(
-      { roundId, voterId: userId },
-      {
-        rank1EntryId: rank1,
-        rank2EntryId: rank2,
-        rank3EntryId: rank3,
-      }
-    )
+    // save the ballot to db atomically and overwrite if they already voted
+    const ballot = await db.transaction(async (trx) => {
+      return await BallotModel.updateOrCreate(
+        { roundId, voterId: userId },
+        {
+          rank1EntryId: rank1,
+          rank2EntryId: rank2,
+          rank3EntryId: rank3,
+        },
+        { client: trx }
+      )
+    })
 
     // run raid analysis in the background
     this.raidService.analyzeAffectedEntries(roundId, [rank1, rank2, rank3]).catch(console.error)
