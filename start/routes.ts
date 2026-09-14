@@ -18,6 +18,12 @@ router.group(() => {
   // auth routes (no auth required for initiation or callback)
   router.get('auth/discord', [AuthController, 'redirect'])
   router.get('auth/discord/callback', [AuthController, 'callback'])
+}).prefix('/api')
+
+router.group(() => {
+  // auth routes (no auth required for initiation or callback)
+  router.get('auth/discord', [AuthController, 'redirect'])
+  router.get('auth/discord/callback', [AuthController, 'callback'])
 
   // authenticated routes
   router.group(() => {
