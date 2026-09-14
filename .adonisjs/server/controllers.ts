@@ -7,6 +7,7 @@ export const controllers = {
   Auth: () => import('#controllers/auth_controller'),
   Ballots: () => import('#controllers/ballots_controller'),
   Entries: () => import('#controllers/entries_controller'),
+  HealthChecks: () => import('#controllers/health_checks_controller'),
   Leaderboard: () => import('#controllers/leaderboard_controller'),
   Reviews: () => import('#controllers/reviews_controller'),
   Rounds: () => import('#controllers/rounds_controller'),

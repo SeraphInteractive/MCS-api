@@ -32,7 +32,31 @@ npm run dev
 npm test
 ```
 
+`@platform/internal-logic` is installed straight from its git repository at a pinned tag (see
+`package.json`); `npm install` needs `git` on the PATH and builds the package on the fly. To move to
+a newer release, bump the `#v…` ref and run `npm install` so the lockfile records the new commit.
+
+## Docker & deployment
+
+`Dockerfile` builds a production image (compiled `build/`, production dependencies only, runs as
+the unprivileged `node` user, `HEALTHCHECK` on `GET /health`). `.github/workflows/docker-publish.yml`
+publishes it to `ghcr.io/seraphinteractive/platform-api` on every push to `main` (`latest`, `main`,
+`sha-<short>`) and on `v*.*.*` tags (`X.Y.Z`, `X.Y`); pull requests only build.
+
+```bash
+docker build -t platform-api .
+docker run --rm --env-file .env -p 3333:3333 platform-api
+# migrations are a separate step, e.g. before starting the server:
+docker run --rm --env-file .env platform-api node ace migration:run --force
+```
+
+The production stack (Postgres, Redis, the Discord bot, Dokploy) lives in
+[Platform-Deployment](https://github.com/SeraphInteractive/Platform-Deployment).
+
 ## API Endpoints
+
+### Health
+- `GET /health` – 200 when Postgres and Redis are reachable, 503 otherwise (used by the container health check)
 
 ### Auth
 - `GET /api/v1/auth/discord/callback`

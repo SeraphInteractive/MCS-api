@@ -2,6 +2,7 @@ import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
 const AuthController = () => import('#controllers/auth_controller')
+const HealthChecksController = () => import('#controllers/health_checks_controller')
 const RoundsController = () => import('#controllers/rounds_controller')
 const EntriesController = () => import('#controllers/entries_controller')
 const BallotsController = () => import('#controllers/ballots_controller')
@@ -13,6 +14,9 @@ const ReviewsController = () => import('#controllers/reviews_controller')
 router.get('/', () => {
   return { status: 'ok', service: 'mcs-voting-api', version: 'v1' }
 })
+
+// container health check: 200 when postgres and redis are reachable, 503 otherwise
+router.get('/health', [HealthChecksController])
 
 router.group(() => {
   // auth routes (no auth required for initiation or callback)

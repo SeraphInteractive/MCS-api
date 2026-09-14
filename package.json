@@ -64,7 +64,7 @@
     "@aws-sdk/client-s3": "^3.1131.0",
     "@aws-sdk/s3-request-presigner": "^3.1131.0",
     "@japa/api-client": "^3.2.1",
-    "@platform/internal-logic": "file:../vote-internals",
+    "@platform/internal-logic": "github:SeraphInteractive/Platform-Internal-Logic#v1.0.0",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
     "luxon": "^3.7.2",
@@ -81,7 +81,8 @@
     "@swc/core": true,
     "better-sqlite3": true,
     "esbuild": true,
-    "fsevents": true
+    "fsevents": true,
+    "@platform/internal-logic": true
   },
   "prettier": "@adonisjs/prettier-config"
 }

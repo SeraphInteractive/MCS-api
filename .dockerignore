@@ -1,0 +1,20 @@
+# dependencies and build output are produced inside the image
+node_modules
+build
+tmp
+
+# never bake secrets or local config into the image
+.env
+.env.*
+
+# vcs, ci and editor files
+.git
+.github
+.vscode
+.idea
+.fleet
+.DS_Store
+
+# docs
+*.md
+LICENSE
