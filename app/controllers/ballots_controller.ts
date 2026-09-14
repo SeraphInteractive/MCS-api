@@ -13,6 +13,12 @@ export default class BallotsController {
     return { data: ballot }
   }
 
+  async index({ params }: HttpContext) {
+    const votingService = new VotingService()
+    const ballots = await votingService.getBallots(params.roundId)
+    return ballots
+  }
+
   async show({ params, auth }: HttpContext) {
     const votingService = new VotingService()
     const ballot = await votingService.getMyBallot(params.roundId, auth.user!.id)

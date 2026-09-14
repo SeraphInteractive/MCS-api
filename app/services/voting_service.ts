@@ -78,6 +78,17 @@ export class VotingService {
       .where('voterId', userId)
       .first()
   }
+
+  async getBallots(roundId: string): Promise<LogicBallot[]> {
+    const models = await BallotModel.query().where('roundId', roundId).orderBy('createdAt', 'asc')
+    return models.map((m) => ({
+      voterId: m.voterId,
+      rank1: m.rank1EntryId,
+      rank2: m.rank2EntryId,
+      rank3: m.rank3EntryId,
+      timestamp: m.createdAt && 'toMillis' in m.createdAt ? (m.createdAt as unknown as { toMillis: () => number }).toMillis() : new Date(m.createdAt as unknown as string).getTime(),
+    }))
+  }
 }
 
 export default VotingService

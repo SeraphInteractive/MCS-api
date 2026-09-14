@@ -10,6 +10,7 @@ const LeaderboardController = () => import('#controllers/leaderboard_controller'
 const TelemetryController = () => import('#controllers/telemetry_controller')
 const ShotsController = () => import('#controllers/shots_controller')
 const ReviewsController = () => import('#controllers/reviews_controller')
+const UploadsController = () => import('#controllers/uploads_controller')
 
 router.get('/', () => {
   return { status: 'ok', service: 'mcs-voting-api', version: 'v1' }
@@ -21,14 +22,14 @@ router.get('/health', [HealthChecksController])
 // unversioned alias of the oauth routes. named separately: routes are auto-named after their
 // controller method, and the same names are taken by the /api/v1 group below
 router.group(() => {
-  router.get('auth/discord', [AuthController, 'redirect'])
-  router.get('auth/discord/callback', [AuthController, 'callback'])
-}).prefix('/api').as('unversioned')
+  router.get('auth/discord', [AuthController, 'redirect']).as('auth.discord.legacy')
+  router.get('auth/discord/callback', [AuthController, 'callback']).as('auth.discord.callback.legacy')
+}).prefix('/api')
 
 router.group(() => {
   // auth routes (no auth required for initiation or callback)
-  router.get('auth/discord', [AuthController, 'redirect'])
-  router.get('auth/discord/callback', [AuthController, 'callback'])
+  router.get('auth/discord', [AuthController, 'redirect']).as('auth.discord.v1')
+  router.get('auth/discord/callback', [AuthController, 'callback']).as('auth.discord.callback.v1')
 
   // authenticated routes
   router.group(() => {
@@ -36,23 +37,31 @@ router.group(() => {
     router.get('auth/me', [AuthController, 'me'])
     router.delete('auth/logout', [AuthController, 'logout'])
 
+    // uploads (images and videos up to 5MB)
+    router.post('uploads', [UploadsController, 'store'])
+
     // rounds (anyone can list/view)
     router.get('rounds', [RoundsController, 'index'])
     router.get('rounds/:id', [RoundsController, 'show'])
 
-    // rounds (admin only)
+    // rounds (admin and supervisor)
     router.group(() => {
       router.post('rounds', [RoundsController, 'store'])
       router.patch('rounds/:id', [RoundsController, 'update'])
       router.post('rounds/:id/finalize', [RoundsController, 'finalize'])
-    }).use(middleware.role({ roles: ['admin'] }))
+    }).use(middleware.role({ roles: ['admin', 'supervisor'] }))
 
-    // entries (anyone can list)
+    // entries - list (anyone can view approved pool or query status)
     router.get('rounds/:roundId/entries', [EntriesController, 'index'])
+    // entries - community submission
+    router.post('rounds/:roundId/entries', [EntriesController, 'store'])
 
-    // entries (admin only)
+    // entries - supervisor / admin status update
+    router.patch('rounds/:roundId/entries/:id/status', [EntriesController, 'updateStatus'])
+      .use(middleware.role({ roles: ['supervisor', 'admin'] }))
+
+    // entries (admin only edit / delete / reinstate)
     router.group(() => {
-      router.post('rounds/:roundId/entries', [EntriesController, 'store'])
       router.patch('rounds/:roundId/entries/:id', [EntriesController, 'update'])
       router.delete('rounds/:roundId/entries/:id', [EntriesController, 'destroy'])
       router.post('rounds/:roundId/entries/:id/reinstate', [EntriesController, 'reinstate'])

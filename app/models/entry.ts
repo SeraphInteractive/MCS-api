@@ -23,6 +23,12 @@ export default class Entry extends BaseModel {
   declare submittedBy: string | null
 
   @column()
+  declare status: 'pending_review' | 'approved' | 'rejected' | 'flagged'
+
+  @column()
+  declare mediaUrl: string | null
+
+  @column()
   declare isQuarantined: boolean
 
   @column.dateTime({ autoCreate: true })

@@ -9,44 +9,80 @@ export default class AuthController {
     const clientId = env.get('DISCORD_CLIENT_ID') as string
     const redirectUri = encodeURIComponent((env.get('DISCORD_REDIRECT_URI') as string) || '')
     const scope = encodeURIComponent('identify')
-    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`
+    const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`
     return response.redirect(discordAuthUrl)
   }
 
   async callback({ request, response }: HttpContext) {
-    const code = request.input('code')
-    if (!code) {
-      return response.badRequest({ error: { code: 'MISSING_CODE', message: 'Discord auth code is missing' } })
-    }
-
-    const discordAuthService = new DiscordAuthService()
-    const tokenResult = await discordAuthService.exchangeCode(code)
-    const profile = await discordAuthService.fetchProfile(tokenResult.accessToken)
-    const user = await discordAuthService.findOrCreateUser(profile)
-
-    // using accessTokens provider
-    const token = await User.accessTokens.create(user)
-    const tokenStr = token.value!.release()
-
-    // check if this is a direct browser navigation, if so redirect back to frontend with token
     let origin = (env.get('CORS_ORIGIN') || 'http://localhost:5173').split(',')[0].trim()
     if (!origin || origin === '*' || !origin.startsWith('http')) {
       origin = 'http://localhost:5173'
     }
     const accept = request.header('accept') || ''
-    if (accept.includes('text/html') || !request.header('x-requested-with')) {
-      return response.redirect(`${origin}/?token=${tokenStr}`)
+    const isBrowserNavigation = accept.includes('text/html') || !request.header('x-requested-with')
+
+    const error = request.input('error')
+    const errorDescription = request.input('error_description')
+    if (error) {
+      if (isBrowserNavigation) {
+        return response.redirect(`${origin}/?error=${encodeURIComponent(error)}&error_description=${encodeURIComponent(errorDescription || '')}`)
+      }
+      return response.badRequest({
+        error: {
+          code: error,
+          message: errorDescription || 'Discord authorization failed',
+        },
+      })
     }
 
-    return {
-      data: {
-        token: tokenStr,
-        user: {
-          id: user.id,
-          discordUsername: user.discordUsername,
-          role: user.role,
+    const code = request.input('code')
+    if (!code) {
+      if (isBrowserNavigation) {
+        return response.redirect(`${origin}/?error=MISSING_CODE&error_description=${encodeURIComponent('Discord auth code is missing')}`)
+      }
+      return response.badRequest({
+        error: {
+          code: 'MISSING_CODE',
+          message: 'Discord auth code is missing',
         },
-      },
+      })
+    }
+
+    try {
+      const discordAuthService = new DiscordAuthService()
+      const tokenResult = await discordAuthService.exchangeCode(code)
+      const profile = await discordAuthService.fetchProfile(tokenResult.accessToken)
+      const user = await discordAuthService.findOrCreateUser(profile)
+
+      // using accessTokens provider
+      const token = await User.accessTokens.create(user)
+      const tokenStr = token.value!.release()
+
+      // check if this is a direct browser navigation, if so redirect back to frontend with token
+      if (isBrowserNavigation) {
+        return response.redirect(`${origin}/?token=${tokenStr}`)
+      }
+
+      return {
+        data: {
+          token: tokenStr,
+          user: {
+            id: user.id,
+            discordUsername: user.discordUsername,
+            role: user.role,
+          },
+        },
+      }
+    } catch (err: any) {
+      if (isBrowserNavigation) {
+        return response.redirect(`${origin}/?error=AUTH_FAILED&error_description=${encodeURIComponent(err?.message || 'Authentication failed')}`)
+      }
+      return response.badRequest({
+        error: {
+          code: 'AUTH_FAILED',
+          message: err?.message || 'Failed to authenticate with Discord',
+        },
+      })
     }
   }
 

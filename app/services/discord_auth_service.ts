@@ -36,7 +36,9 @@ export class DiscordAuthService {
     })
 
     if (!response.ok) {
-      throw new Error('failed to exchange code')
+      const errText = await response.text()
+      console.error('Discord token exchange failed:', response.status, errText)
+      throw new Error(`failed to exchange code: ${errText}`)
     }
 
     const data = (await response.json()) as DiscordTokenResponse
