@@ -23,6 +23,7 @@ export interface ApiDefinition {
     show: typeof routes['rounds.show']
     store: typeof routes['rounds.store']
     update: typeof routes['rounds.update']
+    destroy: typeof routes['rounds.destroy']
     finalize: typeof routes['rounds.finalize']
   }
   entries: {

@@ -16,6 +16,7 @@ export type ScannedRoutes = {
     'rounds.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'rounds.store': { paramsTuple?: []; params?: {} }
     'rounds.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'rounds.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'rounds.finalize': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'entries.index': { paramsTuple: [ParamValue]; params: {'roundId': ParamValue} }
     'entries.store': { paramsTuple: [ParamValue]; params: {'roundId': ParamValue} }
@@ -86,6 +87,7 @@ export type ScannedRoutes = {
   }
   DELETE: {
     'auth.logout': { paramsTuple?: []; params?: {} }
+    'rounds.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'roundId': ParamValue,'id': ParamValue} }
     'shots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }

@@ -48,6 +48,7 @@ router.group(() => {
     router.group(() => {
       router.post('rounds', [RoundsController, 'store'])
       router.patch('rounds/:id', [RoundsController, 'update'])
+      router.delete('rounds/:id', [RoundsController, 'destroy'])
       router.post('rounds/:id/finalize', [RoundsController, 'finalize'])
     }).use(middleware.role({ roles: ['admin', 'supervisor'] }))
 

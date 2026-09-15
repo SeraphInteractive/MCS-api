@@ -151,6 +151,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rounds_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'rounds.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/rounds/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rounds_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rounds_controller').default['destroy']>>>
+    }
+  }
   'rounds.finalize': {
     methods: ["POST"]
     pattern: '/api/v1/rounds/:id/finalize'

@@ -78,6 +78,12 @@ const routes = {
     tokens: [{"old":"/api/v1/rounds/:id","type":0,"val":"api","end":""},{"old":"/api/v1/rounds/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/rounds/:id","type":0,"val":"rounds","end":""},{"old":"/api/v1/rounds/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['rounds.update']['types'],
   },
+  'rounds.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/rounds/:id',
+    tokens: [{"old":"/api/v1/rounds/:id","type":0,"val":"api","end":""},{"old":"/api/v1/rounds/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/rounds/:id","type":0,"val":"rounds","end":""},{"old":"/api/v1/rounds/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['rounds.destroy']['types'],
+  },
   'rounds.finalize': {
     methods: ["POST"],
     pattern: '/api/v1/rounds/:id/finalize',

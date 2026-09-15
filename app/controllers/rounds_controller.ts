@@ -60,4 +60,10 @@ export default class RoundsController {
     
     return { data: result }
   }
+
+  async destroy({ params }: HttpContext) {
+    const round = await VotingRound.findOrFail(params.id)
+    await round.delete()
+    return { data: { success: true, id: params.id } }
+  }
 }
