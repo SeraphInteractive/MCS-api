@@ -14,4 +14,5 @@ export const controllers = {
   Shots: () => import('#controllers/shots_controller'),
   Telemetry: () => import('#controllers/telemetry_controller'),
   Uploads: () => import('#controllers/uploads_controller'),
+  Users: () => import('#controllers/users_controller'),
 }
