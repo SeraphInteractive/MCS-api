@@ -31,6 +31,15 @@ router.group(() => {
   router.get('auth/discord', [AuthController, 'redirect']).as('auth.discord.v1')
   router.get('auth/discord/callback', [AuthController, 'callback']).as('auth.discord.callback.v1')
 
+  // public read routes (no auth required to browse rounds, entries, and leaderboards)
+  router.get('rounds', [RoundsController, 'index'])
+  router.get('rounds/:id', [RoundsController, 'show'])
+  router.get('rounds/:roundId/entries', [EntriesController, 'index'])
+  router.get('rounds/:roundId/leaderboard', [LeaderboardController, 'show'])
+  router.get('rounds/:roundId/results', [LeaderboardController, 'finalized'])
+  router.get('shots', [ShotsController, 'index'])
+  router.get('shots/:id', [ShotsController, 'show'])
+
   // authenticated routes
   router.group(() => {
     // user profile
@@ -40,10 +49,6 @@ router.group(() => {
     // uploads (images and videos up to 5MB)
     router.post('uploads', [UploadsController, 'store'])
 
-    // rounds (anyone can list/view)
-    router.get('rounds', [RoundsController, 'index'])
-    router.get('rounds/:id', [RoundsController, 'show'])
-
     // rounds (admin and supervisor)
     router.group(() => {
       router.post('rounds', [RoundsController, 'store'])
@@ -52,8 +57,6 @@ router.group(() => {
       router.post('rounds/:id/finalize', [RoundsController, 'finalize'])
     }).use(middleware.role({ roles: ['admin', 'supervisor'] }))
 
-    // entries - list (anyone can view approved pool or query status)
-    router.get('rounds/:roundId/entries', [EntriesController, 'index'])
     // entries - community submission
     router.post('rounds/:roundId/entries', [EntriesController, 'store'])
 
@@ -71,10 +74,6 @@ router.group(() => {
     // ballots (any authenticated voter)
     router.post('rounds/:roundId/ballots', [BallotsController, 'store'])
     router.get('rounds/:roundId/ballots/mine', [BallotsController, 'show'])
-
-    // leaderboard (anyone can view)
-    router.get('rounds/:roundId/leaderboard', [LeaderboardController, 'show'])
-    router.get('rounds/:roundId/results', [LeaderboardController, 'finalized'])
 
     // telemetry (supervisor/moderator+)
     router.group(() => {
