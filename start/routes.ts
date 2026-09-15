@@ -11,6 +11,7 @@ const TelemetryController = () => import('#controllers/telemetry_controller')
 const ShotsController = () => import('#controllers/shots_controller')
 const ReviewsController = () => import('#controllers/reviews_controller')
 const UploadsController = () => import('#controllers/uploads_controller')
+const UsersController = () => import('#controllers/users_controller')
 
 router.get('/', () => {
   return { status: 'ok', service: 'mcs-voting-api', version: 'v1' }
@@ -31,7 +32,7 @@ router.group(() => {
   router.get('auth/discord', [AuthController, 'redirect']).as('auth.discord.v1')
   router.get('auth/discord/callback', [AuthController, 'callback']).as('auth.discord.callback.v1')
 
-  // public read routes (no auth required to browse rounds, entries, and leaderboards)
+  // public read routes (no auth required to browse rounds, entries, leaderboards, and presence)
   router.get('rounds', [RoundsController, 'index'])
   router.get('rounds/:id', [RoundsController, 'show'])
   router.get('rounds/:roundId/entries', [EntriesController, 'index'])
@@ -39,12 +40,14 @@ router.group(() => {
   router.get('rounds/:roundId/results', [LeaderboardController, 'finalized'])
   router.get('shots', [ShotsController, 'index'])
   router.get('shots/:id', [ShotsController, 'show'])
+  router.get('users/presence', [UsersController, 'presence'])
 
   // authenticated routes
   router.group(() => {
-    // user profile
+    // user profile & list
     router.get('auth/me', [AuthController, 'me'])
     router.delete('auth/logout', [AuthController, 'logout'])
+    router.get('users', [UsersController, 'index'])
 
     // uploads (images and videos up to 5MB)
     router.post('uploads', [UploadsController, 'store'])
@@ -55,6 +58,7 @@ router.group(() => {
       router.patch('rounds/:id', [RoundsController, 'update'])
       router.delete('rounds/:id', [RoundsController, 'destroy'])
       router.post('rounds/:id/finalize', [RoundsController, 'finalize'])
+      router.patch('users/:id/role', [UsersController, 'updateRole'])
     }).use(middleware.role({ roles: ['admin', 'supervisor'] }))
 
     // entries - community submission
